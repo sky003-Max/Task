@@ -18,8 +18,8 @@ or remote
 Surge 4.0+:
 [Script]
 cron "1 0 * * *" script-path=https://raw.githubusercontent.com/zZPiglet/Task/master/WeChatLottery/WeChatLottery.js
-http-request ^https:\/\/new\.api\.hdcj\.9w9\.com\/api\/sign\/sign script-path=https://raw.githubusercontent.com/zZPiglet/Task/master/WeChatLottery/WeChatLottery.js
-i
+http-request ^https:\/\/new\.api\.hdcj\.9w9\.com\/api\/sign\/sign requires-body=1,max-size=0,script-path=https://raw.githubusercontent.com/zZPiglet/Task/master/WeChatLottery/WeChatLottery.js,script-update-interval=0
+
 
 All app:
 [mitm]
