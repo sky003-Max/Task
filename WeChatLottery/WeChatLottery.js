@@ -13,6 +13,8 @@ or remote
 
 [rewrite_local]
 ^https:\/\/new\.api\.hdcj\.9w9\.com\/api\/sign\/sign url script-request-body WeChatLottery.js
+or remote
+^https:\/\/new\.api\.hdcj\.9w9\.com\/api\/sign\/sign url script-request-body https://raw.githubusercontent.com/zZPiglet/Task/master/WeChatLottery/WeChatLottery.js
 
 Surge 4.0+:
 [Script]

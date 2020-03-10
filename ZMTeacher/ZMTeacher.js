@@ -12,6 +12,9 @@ or remote
 
 [rewrite_local]
 ^https:\/\/teacherapi\.zmlearn\.com\/v1\/teacherApp\/app\/points\/taskCenter url script-request-header ZMTeacher.js
+or remote
+^https:\/\/teacherapi\.zmlearn\.com\/v1\/teacherApp\/app\/points\/taskCenter url script-request-header https://raw.githubusercontent.com/zZPiglet/Task/master/ZMTeacher/ZMTeacher.js
+
 
 Surge 4.0+:
 [Script]
