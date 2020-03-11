@@ -180,15 +180,17 @@ function Checkin() {
                     let luckcoin = obj2.result.sign_lucky[days - 1];
                     let allluckcoin = obj2.result.lucky_count;
                     let luckmoney = obj2.result.money
-                    let msg1 = "今日获得 " + luckcoin + " 币，共有 " + allluckcoin + " 币及 " + luckmoney + " 元。💰";
+                    let msg1 = "签到获得 " + luckcoin + " 币，共有 " + allluckcoin + " 币及 " + luckmoney + " 元。💰";
                     $cmp.notify("活动签到 - 签到成功！🎉", "", msg1)
                 })
             } else if (obj1.result == "今天已签到过了~") {
                 $cmp.post(LotteryData, function (error, response, data) {
                     let obj2 = JSON.parse(data)
+                    let days = obj2.result.cycle;
+                    let luckcoin = obj2.result.sign_lucky[days - 1];
                     let allluckcoin = obj2.result.lucky_count;
                     let luckmoney = obj2.result.money
-                    let msg2 = "账户总额：" + allluckcoin + " 币及 " + luckmoney + " 元。💰"
+                    let msg2 = "今日获得 " + luckcoin + " 币，共有 " + allluckcoin + " 币及 " + luckmoney + " 元。💰"
                     $cmp.notify("活动签到 - 重复签到！😊", "", msg2)
                 })
             } else if (obj1.code == 30001) {
