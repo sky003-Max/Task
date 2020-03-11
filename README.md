@@ -5,5 +5,5 @@
 ## 感谢
 
 [@NobyDa](https://github.com/NobyDa)
-[@tern](https://github.com/yichahucha)
-[@chavy](https://github.com/chavyleung)
+[@yichahucha](https://github.com/yichahucha)
+[@chavyleung](https://github.com/chavyleung)
