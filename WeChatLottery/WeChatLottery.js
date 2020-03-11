@@ -241,8 +241,8 @@ function notify() {
     return new Promise(resolve => {
        try {
            if (datainfo.success == 0) {
-               let days = datainfo.GetData.result.is_sign;
-               let luckcoin = datainfo.GetData.result.sign_lucky[days];
+               let days = datainfo.GetData.result.cycle;
+               let luckcoin = datainfo.GetData.result.sign_lucky[days - 1];
                let allluckcoin = datainfo.GetData.result.lucky_count;
                let luckmoney = datainfo.GetData.result.money;
                let msg1 = "今日获得 " + luckcoin + " 币，共有 " + allluckcoin + " 币及 " + luckmoney + " 元。💰";

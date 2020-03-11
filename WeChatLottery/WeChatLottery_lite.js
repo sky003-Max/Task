@@ -176,8 +176,8 @@ function Checkin() {
             if (obj1.result == "success") {
                 $cmp.post(LotteryData, function (error, response, data) {
                     let obj2 = JSON.parse(data)
-                    let days = obj2.result.is_sign;
-                    let luckcoin = obj2.result.sign_lucky[days];
+                    let days = obj2.result.cycle;
+                    let luckcoin = obj2.result.sign_lucky[days - 1];
                     let allluckcoin = obj2.result.lucky_count;
                     let luckmoney = obj2.result.money
                     let msg1 = "今日获得 " + luckcoin + " 币，共有 " + allluckcoin + " 币及 " + luckmoney + " 元。💰";
