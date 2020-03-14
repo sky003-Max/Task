@@ -97,6 +97,10 @@ function Checkin() {
                 $cmp.notify("掌门好老师 - 签到成功！🎉", "", msg)
             } else if (result.code == 1) {
                 $cmp.notify("掌门好老师 - 重复签到！😊", "", result.message)
+            } else if (result.code == 51) {
+                $cmp.notify("掌门好老师 - 签到未知...😳", "请去 app 检查是否签到成功", result.message + "：" + result.exception)
+            } else if (result.code == 5003) {
+                $cmp.notify("掌门好老师 - 签到未知...😳", "请去 app 检查是否签到成功", result.message)
             } else if (result.code == 11) {
                 $cmp.notify("掌门好老师 - Token 失效❗️", "", result.message)
             } else {
