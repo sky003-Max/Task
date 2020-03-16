@@ -4,7 +4,7 @@
 到 cron 设定时间自动签到时，若弹出"海底捞 - 签到成功"即完成签到，其他提示或无提示请发送日志信息至 issue。
 Author：zZPiglet
 
-Quantumult X (TestFlight 190+, App Store:1.0.6+):
+Quantumult X (TestFlight 195+, App Store:1.0.6+):
 [task_local]
 1 0 * * * Haidilao.js
 or remote
@@ -13,6 +13,9 @@ or remote
 [rewrite_local]
 ^https:\/\/superapp\.kiwa-tech\.com\/app\/coupon\/customerLevelShow url script-request-body Haidilao.js
 ^https:\/\/activity-1\.m\.duiba\.com\.cn\/signactivity\/doSign url script-request-body Haidilao.js
+or remote
+^https:\/\/superapp\.kiwa-tech\.com\/app\/coupon\/customerLevelShow url script-request-body https://raw.githubusercontent.com/zZPiglet/Task/master/Haidilao/Haidilao.js
+^https:\/\/activity-1\.m\.duiba\.com\.cn\/signactivity\/doSign url script-request-body https://raw.githubusercontent.com/zZPiglet/Task/master/Haidilao/Haidilao.js
 
 Surge 4.0+:
 [Script]
