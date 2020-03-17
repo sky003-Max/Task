@@ -1,6 +1,6 @@
 /*
 "海底捞"app自动签到，支持 Quantumult X（理论上也支持 Surge，未尝试）。
-请先按下述方法进行配置，进入"海底捞"app，手动签到一次，若弹出"首次写入海底捞等级 Token 成功"及"首次写入海底捞签到 Cookie 成功"即可正常食用，其他提示或无提示请发送日志信息至 issue。
+请先按下述方法进行配置，进入"海底捞"app，手动签到一次或点击"签到"，若弹出"首次写入海底捞等级 Token 成功"及"首次写入海底捞签到 Cookie 成功"即可正常食用，其他提示或无提示请发送日志信息至 issue。
 到 cron 设定时间自动签到时，若弹出"海底捞 - 签到成功"即完成签到，其他提示或无提示请发送日志信息至 issue。
 Author：zZPiglet
 
@@ -12,16 +12,16 @@ or remote
 
 [rewrite_local]
 ^https:\/\/superapp\.kiwa-tech\.com\/app\/coupon\/customerLevelShow url script-request-body Haidilao.js
-^https:\/\/activity-1\.m\.duiba\.com\.cn\/signactivity\/doSign url script-request-body Haidilao.js
+^https:\/\/activity-1\.m\.duiba\.com\.cn\/signactivity\/getSignInfo url script-request-header Haidilao.js
 or remote
 ^https:\/\/superapp\.kiwa-tech\.com\/app\/coupon\/customerLevelShow url script-request-body https://raw.githubusercontent.com/zZPiglet/Task/master/Haidilao/Haidilao.js
-^https:\/\/activity-1\.m\.duiba\.com\.cn\/signactivity\/doSign url script-request-body https://raw.githubusercontent.com/zZPiglet/Task/master/Haidilao/Haidilao.js
+^https:\/\/activity-1\.m\.duiba\.com\.cn\/signactivity\/getSignInfo url script-request-header https://raw.githubusercontent.com/zZPiglet/Task/master/Haidilao/Haidilao.js
 
 Surge 4.0+:
 [Script]
 cron "1 0 * * *" script-path=https://raw.githubusercontent.com/zZPiglet/Task/master/Haidilao/Haidilao.js
-http-request ^https:\/\/superapp\.kiwa-tech\.com\/app\/coupon\/customerLevelShow requires-body=1,max-size=0,script-path=https://raw.githubusercontent.com/zZPiglet/Task/master/Haidilao/Haidilao.js,script-update-interval=0
-http-request ^https:\/\/activity-1\.m\.duiba\.com\.cn\/signactivity\/doSign requires-body=1,max-size=0,script-path=https://raw.githubusercontent.com/zZPiglet/Task/master/Haidilao/Haidilao.js,script-update-interval=0
+http-request ^https:\/\/superapp\.kiwa-tech\.com\/app\/coupon\/customerLevelShow requires-body=1,max-size=0,script-path=https://raw.githubusercontent.com/zZPiglet/Task/master/Haidilao/Haidilao.js
+http-request ^https:\/\/activity-1\.m\.duiba\.com\.cn\/signactivity\/getSignInfo script-path=https://raw.githubusercontent.com/zZPiglet/Task/master/Haidilao/Haidilao.js
 
 
 All app:
@@ -40,7 +40,6 @@ const TokenHeaderKey = 'hilh'
 const TokenBodyKey = 'hilb'
 const CookieName = '海底捞签到'
 const CookieHeaderKey = 'hich'
-const CookieBodyKey = 'hicb'
 const datainfo = {}
 const $cmp = compatibility()
 
@@ -82,10 +81,8 @@ function Get() {
                 $cmp.notify("首次写入" + TokenName + " Token 成功 🎉", "", "")
             }
         }
-    } else if ($request && $request.method == "POST" && $request.url.indexOf('doSign') >= 0) {
+    } else if ($request && $request.method == "POST" && $request.url.indexOf('getSignInfo') >= 0) {
         var CookieValue = $request.headers['Cookie']
-        var BodyValue = $request.body
-        $cmp.write(BodyValue, CookieBodyKey)
         if ($cmp.read(CookieHeaderKey) != (undefined || null)) {
             if ($cmp.read(CookieHeaderKey) != CookieValue) {
                 var cookie = $cmp.write(CookieValue, CookieHeaderKey)
@@ -164,7 +161,7 @@ function Checkin() {
                 "Cookie": $cmp.read("hich"),
                 "Referer": "https://activity-1.m.duiba.com.cn/signpet/index?activityId=27&from=login&spm=47663.1.1.1",
             },
-            body: $cmp.read("hicb")
+            body: "id=524&signActType=2"
         }
         $cmp.post(HiCheckin, function (error, response, data) {
             try {
