@@ -2,6 +2,9 @@
 微信小程序"活动抽奖"自动签到，支持 Quantumult X（理论上也支持 Surge，未尝试）。
 请先按下述方法进行配置，进入"活动抽奖"，手动签到一次或点击"已签到"，若弹出"首次写入活动抽奖 Token 成功"即可正常食用，其他提示或无提示请发送日志信息至 issue。
 到 cron 设定时间自动签到时，若弹出"活动抽奖 - 签到成功"即完成签到，其他提示或无提示请发送日志信息至 issue。
+
+注意⚠️：此脚本用于在 2020.03.19 及之后需获取过 token 的用户，且需要更换 rewrite 及 hostname。
+
 Author: zZPiglet
 
 Quantumult X (TestFlight 190+, App Store 1.0.5+):
