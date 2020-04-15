@@ -20,6 +20,10 @@ Author: zZPiglet
 
 ----------
 更新日志：
+- 2020/04/15：
+更新任务接口，更新开奖判断，更新 token 是否有效判断。
+修改部分细节。
+
 - 2020/04/09：
 更新接口 v1 -> v2，看不懂这个小程序反复横跳的操作。
 修改 token 失效时的通知。
@@ -173,14 +177,18 @@ function Valid() {
             try {
                 if (response.status == 200) {
                     const obj = JSON.parse(data)
-                    datainfo.exchangeId = 52
-                    datainfo.exchangeStatus = obj.data.user_info.lucky_count >= 12000 ? true : false
-                    if (exchangeMoney == 5) {
-                        datainfo.exchangeId = 454
-                        datainfo.exchangeStatus = obj.data.user_info.lucky_count >= 2500 ? true : false
-                    } else if (exchangeMoney == 20) {
-                        datainfo.exchangeId = 455
-                        datainfo.exchangeStatus = obj.data.user_info.lucky_count >= 8000 ? true : false
+                    if (obj.data.user_info.uname) {
+                        datainfo.exchangeId = 52
+                        datainfo.exchangeStatus = obj.data.user_info.lucky_count >= 12000 ? true : false
+                        if (exchangeMoney == 5) {
+                            datainfo.exchangeId = 454
+                            datainfo.exchangeStatus = obj.data.user_info.lucky_count >= 2500 ? true : false
+                        } else if (exchangeMoney == 20) {
+                            datainfo.exchangeId = 455
+                            datainfo.exchangeStatus = obj.data.user_info.lucky_count >= 8000 ? true : false
+                        }
+                    } else {
+                        ValidToken = false
                     }
                 } else {
                     ValidToken = false
@@ -296,6 +304,34 @@ function Join() {
                 resolve('done')
             }
         })
+        $cmp.get(LotteryLuckGift, function(error, response, data) {
+            try{
+                const luckgiftindex = JSON.parse(data)
+                let newlg = luckgiftindex.data.hb_data[0]
+                datainfo.winluckgift = luckgiftindex.data.hb_data[1].id
+                const LotteryJoin = {
+                    url: LotteryURL + newlg.id + '/join',
+                    headers:  commonheaders,
+                    body: { "template": "" }
+                }
+                $cmp.post(LotteryJoin, function (error, response, data) {
+                    try{
+                        const joindata = JSON.parse(data)
+                        if (joindata.success == true) {
+                            datainfo.joinCnt += 1
+                        }
+                        resolve('done')
+                    } catch (e) {
+                        $cmp.notify("活动抽奖幸运大礼" + e.name + "‼️", JSON.stringify(e), e.message)
+                        resolve('done')
+                    }
+                })
+                resolve('done')
+            } catch (e) {
+                $cmp.notify("活动抽奖获取抽奖列表" + e.name + "‼️", JSON.stringify(e), e.message)
+                resolve('done')
+            }
+        })
         $cmp.get(LotteryIndex2, function(error, response, data) {
             try{
                 const index = JSON.parse(data)
@@ -327,33 +363,6 @@ function Join() {
                         })
                     }
                 }
-                resolve('done')
-            } catch (e) {
-                $cmp.notify("活动抽奖获取抽奖列表" + e.name + "‼️", JSON.stringify(e), e.message)
-                resolve('done')
-            }
-        })
-        $cmp.get(LotteryLuckGift, function(error, response, data) {
-            try{
-                const luckgiftindex = JSON.parse(data)
-                let newlg = luckgiftindex.data.hb_data[0]
-                const LotteryJoin = {
-                    url: LotteryURL + newlg.id + '/join',
-                    headers:  commonheaders,
-                    body: { "template": "" }
-                }
-                $cmp.post(LotteryJoin, function (error, response, data) {
-                    try{
-                        const joindata = JSON.parse(data)
-                        if (joindata.success == true) {
-                            datainfo.joinCnt += 1
-                        }
-                        resolve('done')
-                    } catch (e) {
-                        $cmp.notify("活动抽奖幸运大礼" + e.name + "‼️", JSON.stringify(e), e.message)
-                        resolve('done')
-                    }
-                })
                 resolve('done')
             } catch (e) {
                 $cmp.notify("活动抽奖获取抽奖列表" + e.name + "‼️", JSON.stringify(e), e.message)
@@ -406,15 +415,14 @@ function Task() {
                 datainfo.taskcoin = 0
                 datainfo.taskCnt = 0
                 datainfo.taskfailCnt = 0
-                let newlist = gettask.data.task_new.list
+                let welfarelist = gettask.data.task_welfare.list
                 let daylist = gettask.data.task_day.list
-                let weeklist = gettask.data.task_week.list
-                for (var newl of newlist) {
+                for (var welfarel of welfarelist) {
                     const LotteryTask = {
-                        url: TaskURL + newl.id,
+                        url: TaskURL + welfarel.id,
                         headers:  commonheaders
                     }
-                    let ename = newl.name
+                    let ename = welfarel.name
                     $cmp.post(LotteryTask, function (error, response, data) {
                         try{
                             const task = JSON.parse(data)
@@ -455,29 +463,6 @@ function Task() {
                         }
                     })
                 }
-                for (var weekl of weeklist) {
-                    const LotteryTask = {
-                        url: TaskURL + weekl.id,
-                        headers:  commonheaders
-                    }
-                    let ename = weekl.name
-                    $cmp.post(LotteryTask, function (error, response, data) {
-                        try{
-                            const task = JSON.parse(data)
-                            if (task.success == true && task.data) {
-                                datainfo.taskCnt += 1
-                                datainfo.taskcoin += Number(task.data.lucky_count)
-                            } else if (task.success == false) {
-                                datainfo.taskfailCnt += 1
-                                $cmp.log('\n' + ename + '：' + task.message.error)
-                            }
-                            resolve('done')
-                        } catch (e) {
-                            $cmp.notify("活动抽奖" + ename + "任务" + e.name + "‼️", JSON.stringify(e), e.message)
-                            resolve('done')
-                        }
-                    })
-                }
                 resolve('done')
             } catch (e) {
                 $cmp.notify("活动抽奖任务列表" + e.name + "‼️", JSON.stringify(e), e.message)
@@ -493,92 +478,100 @@ function Win() {
             "token" : $cmp.read('wclotterynew'),
             "uid" : $cmp.read('wcluid'),
         }
-        for (let pagenum = 1; pagenum <= 3; pagenum++) {
-            const LotteryWin = {
-                url: WinURL + '?page=' + pagenum + '&limit=20',
-                headers: commonheaders
-            }
-            $cmp.get(LotteryWin, function(error, response, data) {
-                try{
-                    const win = JSON.parse(data)
-                    datainfo.winCnt = 0
-                    datainfo.winmoney = 0
-                    datainfo.wincoin = 0
-                    datainfo.couponCnt = 0
-                    let winlist = win.data.data
-                    for (var winl of winlist) {
-                        if (winl.sponsor_name == '活动抽奖福利君') {
-                            const LotteryWin = {
-                                url: LotteryURL + winl.id + '/split',
-                                headers:  commonheaders
-                            }
-                            $cmp.post(LotteryWin, function (error, response, data) {
-                                try{
-                                    const winmoney = JSON.parse(data)
-                                    if (winmoney.success == true) {
-                                        datainfo.winCnt += 1
-                                        datainfo.winmoney += Number(winmoney.data.money)
-                                    }
-                                    resolve('done')
-                                } catch (e) {
-                                    $cmp.notify("活动抽奖" + winl.sponsor_name + "开奖" + e.name + "‼️", JSON.stringify(e), e.message)
-                                    resolve('done')
-                                }
-                            })
-                        } else if (winl.brand_name == '活动抽奖') {
-                            const LotteryWin = {
-                                url: LotteryURL + winl.id + '/lucky',
-                                headers:  commonheaders
-                            }
-                            $cmp.post(LotteryWin, function (error, response, data) {
-                                try{
-                                    const wincoin = JSON.parse(data)
-                                    if (wincoin.success == true) {
-                                        datainfo.winCnt += 1
-                                        datainfo.wincoin += 100
-                                    }
-                                    resolve('done')
-                                } catch (e) {
-                                    $cmp.notify("活动抽奖" + winl.sponsor_name + "开奖" + e.name + "‼️", JSON.stringify(e), e.message)
-                                    resolve('done')
-                                }
-                            })
-                        } else {
-                            const LotteryInfo = {
-                                url: LotteryURL + winl.id + '?qrcode_id=',
-                                headers: commonheaders
-                            }
-                            $cmp.get(LotteryInfo, function (error, response, data) {
-                                const linfo = JSON.parse(data)
-                                if (linfo.data.bags_info.id) {
-                                    const LotteryWin = {
-                                        url: CouponURL + linfo.data.bags_info.id,
-                                        headers:  commonheaders
-                                    }
-                                    $cmp.post(LotteryWin, function (error, response, data) {
-                                        try{
-                                            const wincoupon = JSON.parse(data)
-                                            if (wincoupon.success == true && wincoupon.data.data.mark == true) {
-                                                datainfo.winCnt += 1
-                                                datainfo.couponCnt += 1
-                                            }
-                                            resolve('done')
-                                        } catch (e) {
-                                            $cmp.notify("活动抽奖" + winl.sponsor_name + "开奖" + e.name + "‼️", JSON.stringify(e), e.message)
-                                            resolve('done')
-                                        }
-                                    })
-                                }
-                            })
-                        }
-                    }
-                    resolve('done')
-                } catch (e) {
-                    $cmp.notify("活动抽奖任务列表" + e.name + "‼️", JSON.stringify(e), e.message)
-                    resolve('done')
-                }
-            })
+        const LotteryWin = {
+            url: WinURL,
+            headers: commonheaders
         }
+        datainfo.winCnt = 0
+        datainfo.winmoney = 0
+        datainfo.wincoin = 0
+        datainfo.couponCnt = 0
+        $cmp.get(LotteryWin, function(error, response, data) {
+            try{
+                const win = JSON.parse(data)
+                let winlist = win.data.data
+                for (var winl of winlist) {
+                    if (winl.lname == '瓜分5万元现金红包大奖') {
+                        const LotteryWin = {
+                            url: LotteryURL + winl.id + '/split',
+                            headers:  commonheaders
+                        }
+                        $cmp.post(LotteryWin, function (error, response, data) {
+                            try{
+                                const winmoney = JSON.parse(data)
+                                if (winmoney.success == true) {
+                                    datainfo.winCnt += 1
+                                    datainfo.winmoney += Number(winmoney.data.money)
+                                }
+                                resolve('done')
+                            } catch (e) {
+                                $cmp.notify("活动抽奖" + winl.sponsor_name + "开奖" + e.name + "‼️", JSON.stringify(e), e.message)
+                                resolve('done')
+                            }
+                        })
+                    } else if (winl.brand_name == '活动抽奖') {
+
+                    } else {
+                        const LotteryInfo = {
+                            url: LotteryURL + winl.id + '?qrcode_id=',
+                            headers: commonheaders
+                        }
+                        $cmp.get(LotteryInfo, function (error, response, data) {
+                            const linfo = JSON.parse(data)
+                            if (linfo.data.bags_info.id) {
+                                const LotteryWin = {
+                                    url: CouponURL + linfo.data.bags_info.id,
+                                    headers:  commonheaders
+                                }
+                                $cmp.post(LotteryWin, function (error, response, data) {
+                                    try{
+                                        const wincoupon = JSON.parse(data)
+                                        if (wincoupon.success == true && wincoupon.data.data.mark == true) {
+                                            datainfo.winCnt += 1
+                                            datainfo.couponCnt += 1
+                                        }
+                                        resolve('done')
+                                    } catch (e) {
+                                        $cmp.notify("活动抽奖" + winl.sponsor_name + "开奖" + e.name + "‼️", JSON.stringify(e), e.message)
+                                        resolve('done')
+                                    }
+                                })
+                            }
+                        })
+                    }
+                }
+                resolve('done')
+            } catch (e) {
+                $cmp.notify("活动抽奖任务列表" + e.name + "‼️", JSON.stringify(e), e.message)
+                resolve('done')
+            }
+        })
+        const Luckgift = {
+            url: LotteryURL + datainfo.winluckgift + '?qrcode_id=',
+            headers: commonheaders
+        }
+        $cmp.get(Luckgift, function (error, response, data) {
+            const lg = JSON.parse(data)
+            if (lg.data.situation == '已开奖，用户已参与已中奖') {
+                const LotteryWinLuck = {
+                    url: LotteryURL + datainfo.winluckgift + '/lucky',
+                    headers:  commonheaders
+                }
+                $cmp.post(LotteryWinLuck, function (error, response, data) {
+                    try{
+                        const wincoin = JSON.parse(data)
+                        if (wincoin.success == true) {
+                            datainfo.winCnt += 1
+                            datainfo.wincoin += 100
+                        }
+                        resolve('done')
+                    } catch (e) {
+                        $cmp.notify("活动抽奖幸运大礼开奖" + e.name + "‼️", JSON.stringify(e), e.message)
+                        resolve('done')
+                    }
+                })
+            }
+        })
     })
 }
 
